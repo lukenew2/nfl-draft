@@ -5,7 +5,7 @@ import os
 import pandas as pd
 
 # The base url where the data we desire is located
-BASE_URL = "https://www.fantasypros.com/nfl/adp/overall.php"
+BASE_URL = "https://www.fantasypros.com/nfl/adp/ppr-overall.php"
 # Header which allows our webscraper to appear more human
 headers = ({"user-agent":
 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36"})
@@ -19,12 +19,12 @@ def make_adp_df():
     table = page_html.find('table', id='data') # Finds the table from html
     df = pd.read_html(str(table))[0] # Extracts data from html table
     print("Output after reading html:\n\n", df.head(), '\n')
-    df = df[["Player Team (Bye)", "POS", "AVG"]] # Filters important columns
+    df = df[["Player Team (Bye)", "POS", "AVG", "ESPN"]] # Filters important columns
     print("Output after filtering columns:\n\n", df.head(), '\n')
     df["PLAYER"] = df["Player Team (Bye)"].apply(lambda x: ' '.join(x.split()[:-2])) # Extract players name
     df["POS"] = df["POS"].str.extract(pat='([A-Z]+)') # Remove position rank
 
-    df = df[["PLAYER", "POS", "AVG"]].sort_values("AVG") # Sort players by ADP
+    df = df[["PLAYER", "POS", "AVG", "ESPN"]].sort_values("AVG") # Sort players by ADP
 
     print("Final output:\n\n", df.head(15))
 
@@ -44,7 +44,7 @@ def make_projection_df():
 
     final_df = pd.DataFrame() # Create final dataframe for concatenation
 
-    for position in ["rb", "qb", "te", "wr", "k"]:
+    for position in ["rb", "qb", "te", "wr"]:
 
         r = get(BASE_URL.format(position=position)) # format our url with each position
 
